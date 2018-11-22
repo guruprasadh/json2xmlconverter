@@ -26,29 +26,29 @@ import com.risksense.converters.json2xmlconverter.util.JsonReaderUtil;
 public class XMLJSONConverterImpl implements XMLJSONConverterI {
 
 	private static ObjectMapper mapper = new ObjectMapper();
-	private static final Logger LOGGER = LoggerFactory.getLogger(XMLJSONConverterImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(XMLJSONConverterI.class);
 
 	@Override
 	public void convertJSONtoXML(File json, File xml) throws IOException {
 		LOGGER.info("Started processing");
-		byte[] fileContent;
-		fileContent = Files.readAllBytes(json.toPath());
+		byte[] fileContent = Files.readAllBytes(json.toPath());
 		String xmlContent = readJson(new String(fileContent));
 		Files.write(xml.toPath(), xmlContent.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
-		LOGGER.info("Finished writing to xml file %s", xml.getName());
+		LOGGER.info("Finished writing to xml file {}", xml.getName());
 	}
 
 	private String readJson(String jsonInput) {
 		try {
+			LOGGER.trace("File read success for the json string {}", jsonInput);
 			Document doc = getParentDocument();
 			JsonReaderUtil.processNode(mapper.readTree(jsonInput), null, null, doc);
 			LOGGER.info("Finished processing Json node");
 			return parseDocumentToString(doc);
 		} catch (IOException e) {
-			LOGGER.error(Json2XmlConverterConstants.INVALIDJSON_ERROR);
+			LOGGER.error(Json2XmlConverterConstants.INVALIDJSON_ERROR, " {}", e.getMessage());
 			return Json2XmlConverterConstants.INVALIDJSON_ERROR;
 		} catch (ParserConfigurationException e) {
-			LOGGER.error(Json2XmlConverterConstants.DOCFACTORY_ERROR);
+			LOGGER.error(Json2XmlConverterConstants.DOCFACTORY_ERROR, " {}", e.getMessage());
 			return Json2XmlConverterConstants.DOCFACTORY_ERROR;
 		}
 
@@ -56,7 +56,7 @@ public class XMLJSONConverterImpl implements XMLJSONConverterI {
 
 	private String parseDocumentToString(Document doc) {
 		try {
-			LOGGER.trace("Document to string - being");
+			LOGGER.trace("Document to string - begin");
 			DOMSource domSource = new DOMSource(doc.getFirstChild().getLastChild());
 			StringWriter writer = new StringWriter();
 			StreamResult result = new StreamResult(writer);
@@ -67,7 +67,7 @@ public class XMLJSONConverterImpl implements XMLJSONConverterI {
 			LOGGER.trace("Document to string - end");
 			return writer.toString();
 		} catch (TransformerException e) {
-			LOGGER.error(Json2XmlConverterConstants.XML2STRING_ERROR);
+			LOGGER.error(Json2XmlConverterConstants.XML2STRING_ERROR, " {}", e.getMessage());
 			return Json2XmlConverterConstants.XML2STRING_ERROR;
 		}
 	}

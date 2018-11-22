@@ -32,7 +32,7 @@
 		<appender-ref ref="Console" />
 	</root>
 	 
-	<logger name="com.risksense" level="info" additivity="false">
+	<logger name="com.risksense" level="trace" additivity="false">
 		<appender-ref ref="RollingFile" />
 		<appender-ref ref="Console" />
 	</logger>
