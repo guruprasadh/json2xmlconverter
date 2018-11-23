@@ -9,19 +9,31 @@ import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.risksense.converters.ConverterFactory;
 import com.risksense.converters.XMLJSONConverterI;
+import com.risksense.converters.json2xmlconverter.Json2XmlConverterConstants;
 
+/**
+ * This controller exposes the Json2Xml conversion as a rest service
+ *
+ */
 @RestController
 public class Json2XmlController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Json2XmlController.class);
 
-	@RequestMapping("/json2xml")
+	/**
+	 * This is method holding the logic to read and process based on the input
+	 * 
+	 * @param input
+	 * @param output
+	 * @return
+	 */
+	@GetMapping("/json2xml")
 	public String convertJson2Xml(@RequestParam(value = "json", required = true) String input,
 			@RequestParam(value = "xml", required = true) String output) {
 		LOGGER.info("Started processing");
@@ -37,10 +49,17 @@ public class Json2XmlController {
 				return "Error while reading/writing the file - please refer logs for more details";
 			}
 		} else {
-			return "Input file not found";
+			return Json2XmlConverterConstants.IONOTFOUND;
 		}
 	}
 
+	/**
+	 * Method to validate and load the given input file.
+	 * 
+	 * 
+	 * @param input
+	 * @return
+	 */
 	private File getInputFile(String input) {
 		try {
 			return ResourceUtils.getFile(input);
@@ -50,6 +69,12 @@ public class Json2XmlController {
 		}
 	}
 
+	/**
+	 * Method to validate and load the given output file
+	 * 
+	 * @param output
+	 * @return
+	 */
 	private File getOutputFile(String output) {
 		try {
 			File outputFile = ResourceUtils.getFile(output);

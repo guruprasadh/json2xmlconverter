@@ -7,5 +7,5 @@ public class Json2XmlConverterConstants {
 	public static final String DOCFACTORY_ERROR = "<Error>Error while creating document factory</Error>";
 	public static final String JSONREAD_ERROR = "<Error>Error while reading json document</Error>";
 	public static final String XMLWRITE_ERROR = "<Error>Error while writing xml document</Error>";
-
+	public static final String IONOTFOUND = "Input/Output file not found - please refer logs for more details";
 }

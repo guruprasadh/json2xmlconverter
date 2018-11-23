@@ -9,6 +9,7 @@ import java.nio.file.StandardOpenOption;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.risksense.converters.XMLJSONConverterI;
 import com.risksense.converters.json2xmlconverter.util.JsonReaderUtil;
@@ -37,11 +39,23 @@ public class XMLJSONConverterImpl implements XMLJSONConverterI {
 		LOGGER.info("Finished writing to xml file {}", xml.getName());
 	}
 
+	/**
+	 * Method to read and process the Json node
+	 * 
+	 * @param jsonInput
+	 * @return
+	 */
 	private String readJson(String jsonInput) {
 		try {
 			LOGGER.trace("File read success for the json string {}", jsonInput);
 			Document doc = getParentDocument();
-			JsonReaderUtil.processNode(mapper.readTree(jsonInput), null, null, doc);
+			JsonNode node = mapper.readTree(jsonInput);
+			// Processing empty Json
+			if (null == node) {
+				LOGGER.info("An attempt to process an empty JSON");
+				return "";
+			}
+			JsonReaderUtil.processNode(node, null, null, doc);
 			LOGGER.info("Finished processing Json node");
 			return parseDocumentToString(doc);
 		} catch (IOException e) {
@@ -54,15 +68,20 @@ public class XMLJSONConverterImpl implements XMLJSONConverterI {
 
 	}
 
+	/**
+	 * Converts the document object into a XML String
+	 * 
+	 * @param doc
+	 * @return
+	 */
 	private String parseDocumentToString(Document doc) {
 		try {
 			LOGGER.trace("Document to string - begin");
 			DOMSource domSource = new DOMSource(doc.getFirstChild().getLastChild());
 			StringWriter writer = new StringWriter();
 			StreamResult result = new StreamResult(writer);
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer;
-			transformer = tf.newTransformer();
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.transform(domSource, result);
 			LOGGER.trace("Document to string - end");
 			return writer.toString();
@@ -72,6 +91,13 @@ public class XMLJSONConverterImpl implements XMLJSONConverterI {
 		}
 	}
 
+	/**
+	 * This method returns a new Document factory which is used in writing the json
+	 * contents to a XML Document
+	 * 
+	 * @return
+	 * @throws ParserConfigurationException
+	 */
 	private Document getParentDocument() throws ParserConfigurationException {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = null;

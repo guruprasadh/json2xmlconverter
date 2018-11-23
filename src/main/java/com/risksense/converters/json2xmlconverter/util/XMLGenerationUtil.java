@@ -11,7 +11,15 @@ public class XMLGenerationUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLGenerationUtil.class);
 
-	public static Element createParent(String parentName, String attributeName, Document doc, String value) {
+	/**
+	 * This method creates a new root element as part of the given document object
+	 * 
+	 * @param parentName
+	 * @param doc
+	 * @param value
+	 * @return
+	 */
+	public static Element createParent(String parentName, Document doc, String value) {
 		Element rootElement = doc.createElement(parentName.toLowerCase());
 		rootElement.setTextContent(value);
 		doc.appendChild(rootElement);
@@ -19,6 +27,17 @@ public class XMLGenerationUtil {
 		return rootElement;
 	}
 
+	/**
+	 * This method creates and populates a new child element and appends it with the
+	 * given parent element
+	 * 
+	 * @param doc
+	 * @param childName
+	 * @param attributeValue
+	 * @param parent
+	 * @param value
+	 * @return
+	 */
 	public static Element createChlild(Document doc, String childName, String attributeValue, Element parent,
 			String value) {
 		Element childElement = doc.createElement(childName.toLowerCase());
